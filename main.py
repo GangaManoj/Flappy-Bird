@@ -26,6 +26,7 @@ def draw_pipes(pipes):
 def check_collision(pipes):
     for pipe in pipes:
         if pipe.colliderect(bird_rect):
+            death_sound.play()
             return False
     if bird_rect.top <= -50 or bird_rect.bottom >= 520:
             return False
@@ -59,8 +60,12 @@ def update_high_score(score, high_score):
         high_score = score
     return high_score
 
+pygame.mixer.pre_init(frequency = 44100, size = 16, channels = 1, buffer = 512)
 pygame.init()
 screen = pygame.display.set_mode((400,600))
+pygame.display.set_caption("Flappy Bird")
+icon = pygame.image.load('assets/lovebird.png')
+pygame.display.set_icon(icon)
 clock = pygame.time.Clock()
 game_font = pygame.font.Font('04B_19.ttf',40)
 
@@ -78,9 +83,9 @@ floor_surface = pygame.image.load('assets/base.png').convert()
 floor_surface = pygame.transform.scale(floor_surface, (400,80))
 floor_x = 0
 
-bird_downflap = pygame.transform.scale(pygame.image.load('assets/bluebird-downflap.png').convert_alpha(), (50,35))
-bird_midflap = pygame.transform.scale(pygame.image.load('assets/bluebird-midflap.png').convert_alpha(), (50,35))
-bird_upflap = pygame.transform.scale(pygame.image.load('assets/bluebird-upflap.png').convert_alpha(), (50,35))
+bird_downflap = pygame.transform.scale(pygame.image.load('assets/yellowbird-downflap.png').convert_alpha(), (50,35))
+bird_midflap = pygame.transform.scale(pygame.image.load('assets/yellowbird-midflap.png').convert_alpha(), (50,35))
+bird_upflap = pygame.transform.scale(pygame.image.load('assets/yellowbird-upflap.png').convert_alpha(), (50,35))
 bird_frames = [bird_downflap, bird_midflap, bird_upflap]
 bird_index = 0
 bird_surface = bird_frames[bird_index]
@@ -100,6 +105,12 @@ pygame.time.set_timer(SPAWNPIPE, 1200)
 game_over_surface = pygame.image.load('assets/message.png').convert_alpha()
 game_over_rect = game_over_surface.get_rect(center = (200,300))
 
+#sounds
+flap_sound = pygame.mixer.Sound('sounds/sfx_wing.wav')
+death_sound = pygame.mixer.Sound('sounds/sfx_hit.wav')
+score_sound = pygame.mixer.Sound('sounds/sfx_point.wav')
+score_sound_countdown = 100
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -109,6 +120,7 @@ while True:
             if event.key == pygame.K_UP and game_active:
                 bird_movement = 0
                 bird_movement -= 5
+                flap_sound.play()
             if event.key == pygame.K_RETURN and game_active == False:
                 game_active = True
                 pipe_list.clear()
@@ -141,6 +153,10 @@ while True:
         #score
         display_score('playing')
         score += 0.01
+        score_sound_countdown -= 1
+        if score_sound_countdown <= 0:
+            score_sound.play()
+            score_sound_countdown = 100
     else:
         high_score = update_high_score(score, high_score)
         display_score('game_over')
