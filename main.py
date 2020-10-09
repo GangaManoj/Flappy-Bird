@@ -40,14 +40,36 @@ def animate_bird():
     new_bird_rect = new_bird.get_rect(center = (75, bird_rect.centery))
     return new_bird, new_bird_rect
 
+def display_score(game_state):
+    if game_state == "playing":
+        score_surface = game_font.render(str(int(score)), True, (255,255,255))
+        score_rect = score_surface.get_rect(center = (200, 100))
+        screen.blit(score_surface, score_rect)
+    else:
+        score_surface = game_font.render(f"Score: {int(score)}", True, (255,255,255))
+        score_rect = score_surface.get_rect(center = (200, 100))
+        screen.blit(score_surface, score_rect)
+
+        high_score_surface = game_font.render(f"High Score: {int(high_score)}", True, (255,255,255))
+        hight_score_rect = high_score_surface.get_rect(center = (200, 480))
+        screen.blit(high_score_surface, hight_score_rect)
+
+def update_high_score(score, high_score):
+    if score > high_score:
+        high_score = score
+    return high_score
+
 pygame.init()
 screen = pygame.display.set_mode((400,600))
 clock = pygame.time.Clock()
+game_font = pygame.font.Font('04B_19.ttf',40)
 
 #game variables
 gravity = 0.12
 bird_movement = 0
 game_active = True
+score = 0
+high_score = 0
 
 bg_surface = pygame.image.load('assets/background-day.png').convert()
 bg_surface = pygame.transform.scale(bg_surface, (400,600))
@@ -93,6 +115,7 @@ while True:
                 pipe_list.clear()
                 bird_rect.center = (75,300)
                 bird_movement = 0
+                score = 0
         if event.type == SPAWNPIPE:
             pipe_list.extend(create_pipe())
         if event.type == BIRDFLAP:
@@ -115,6 +138,13 @@ while True:
         # pipes
         pipe_list = move_pipes(pipe_list)
         draw_pipes(pipe_list)
+
+        #score
+        display_score('playing')
+        score += 0.01
+    else:
+        high_score = update_high_score(score, high_score)
+        display_score('game_over')
 
     # floor
     draw_floor()
