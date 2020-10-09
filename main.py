@@ -89,10 +89,6 @@ bird_rect = bird_surface.get_rect(center = (75,300))
 BIRDFLAP = pygame.USEREVENT + 1
 pygame.time.set_timer(BIRDFLAP, 200)
 
-# bird_surface = pygame.image.load('assets/bluebird-midflap.png').convert_alpha()
-# bird_surface = pygame.transform.scale(bird_surface, (50,35))
-# bird_rect = bird_surface.get_rect(center = (75,300))
-
 pipe_surface = pygame.image.load('assets/pipe-green.png').convert()
 pipe_surface = pygame.transform.scale(pipe_surface, (70,420))
 pipe_list = []
@@ -100,6 +96,9 @@ pipe_height = [450, 350, 250]
 
 SPAWNPIPE = pygame.USEREVENT
 pygame.time.set_timer(SPAWNPIPE, 1200)
+
+game_over_surface = pygame.image.load('assets/message.png').convert_alpha()
+game_over_rect = game_over_surface.get_rect(center = (200,300))
 
 while True:
     for event in pygame.event.get():
@@ -145,6 +144,7 @@ while True:
     else:
         high_score = update_high_score(score, high_score)
         display_score('game_over')
+        screen.blit(game_over_surface, game_over_rect)
 
     # floor
     draw_floor()
